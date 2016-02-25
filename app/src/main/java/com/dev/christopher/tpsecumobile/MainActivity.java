@@ -1,10 +1,21 @@
 package com.dev.christopher.tpsecumobile;
 
+import android.annotation.TargetApi;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.provider.Telephony;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView message;
     private static MainActivity mainActivity;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+        //intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getApplicationContext().getPackageName());
+
+    }
 
     public static MainActivity getInstance(){
         return mainActivity;
@@ -32,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mainActivity = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -45,6 +64,21 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (!isDefaultSmsApp(getApplicationContext())) {
+                final String packageName = getApplicationContext().getPackageName();
+                Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+                intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName);
+                startActivityForResult(intent, 0);
+            }
+        }
+    }
+    public void sendMessage(ContentResolver resolver, SmsMessage smsManager){
+        ContentResolver cnt = resolver;
+
+        ContentValues values = new ContentValues();
+        //values.put("messageBody",smsManager);
+        cnt.insert(Uri.parse("content://sms"), values);
     }
 
     @Override
@@ -67,5 +101,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static boolean isDefaultSmsApp(Context context) {
+        return context.getPackageName().equals(Telephony.Sms.getDefaultSmsPackage(context));
     }
 }
