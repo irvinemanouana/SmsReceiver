@@ -17,6 +17,9 @@ import android.widget.Toast;
  */
 public class Getsms extends BroadcastReceiver {
     final SmsManager sms = SmsManager.getDefault();
+
+    MainActivity mainActivity = new MainActivity();
+
     String string = "JE T'AI UE";
     String smsBody;
 
@@ -27,6 +30,7 @@ public class Getsms extends BroadcastReceiver {
         if (intentExtras != null) {
             Object[] sms = (Object[]) intentExtras.get(SMS_BUNDLE);
             String smsMessageStr = "";
+
             for (int i = 0; i < sms.length; ++i) {
                 SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[i]);
 
@@ -42,11 +46,14 @@ public class Getsms extends BroadcastReceiver {
                 values.put("body",smsBody+string);
 
                 cnt.insert(Uri.parse("content://sms"), values);
+
+                mainActivity.getInstance().sendMessage(cnt,smsMessage, string);
             }
-            Toast.makeText(context,smsBody+" "+string , Toast.LENGTH_SHORT).show();
-            Bundle bundle = intent.getExtras();
-            MainActivity mainActivity = new MainActivity();
+            Toast.makeText(context, smsBody + " " + string, Toast.LENGTH_SHORT).show();
+
+
             mainActivity.getInstance().updateTextView(smsMessageStr);
+
 
 
 

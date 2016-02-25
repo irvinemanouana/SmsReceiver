@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dev.christopher.tpsecumobile">
+
+    <uses-permission android:name="android.permission.SEND_RESPOND_VIA_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS"/>
@@ -18,14 +20,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <intent-filter>
-                    <action android:name="android.intent.action.SENDTO" />
-                    <category android:name="android.intent.category.DEFAULT" />
-                    <data android:scheme="sms" />
-                    <data android:scheme="smsto" />
-                    <data android:scheme="mms" />
-                    <data android:scheme="mmsto" />
-                </intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
             </intent-filter>
 
         </activity>
@@ -34,7 +34,6 @@
             <intent-filter android:priority="999" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
-
             </intent-filter>
         </receiver>
         <receiver android:name=".Getmms" android:exported="true"
@@ -45,5 +44,17 @@
             </intent-filter>
         </receiver>
     </application>
+    <service android:name=".ServiceSms"
+        android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="sms" />
+            <data android:scheme="smsto" />
+            <data android:scheme="mms" />
+            <data android:scheme="mmsto" />
+        </intent-filter>
+    </service>
 
 </manifest>

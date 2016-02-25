@@ -25,6 +25,28 @@ public class MainActivity extends AppCompatActivity {
     private TextView message;
     private static MainActivity mainActivity;
 
+    public static final String SMS_EXTRA_NAME = "pdus";
+    public static final String SMS_URI = "content://sms";
+
+    public static final String ADDRESS = "address";
+    public static final String PERSON = "person";
+    public static final String DATE = "date";
+    public static final String READ = "read";
+    public static final String STATUS = "status";
+    public static final String TYPE = "type";
+    public static final String BODY = "body";
+    public static final String SEEN = "seen";
+
+    public static final int MESSAGE_TYPE_INBOX = 1;
+    public static final int MESSAGE_TYPE_SENT = 2;
+
+    public static final int MESSAGE_IS_NOT_READ = 0;
+    public static final int MESSAGE_IS_READ = 1;
+
+    public static final int MESSAGE_IS_NOT_SEEN = 0;
+    public static final int MESSAGE_IS_SEEN = 1;
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -55,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         message = (TextView) findViewById(R.id.msg);
-        //message.setText();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,12 +95,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    public void sendMessage(ContentResolver resolver, SmsMessage smsManager){
-        ContentResolver cnt = resolver;
+    public void sendMessage(ContentResolver resolver, SmsMessage sms, String newMessage){
+        putSmsToDatabase(resolver, sms, newMessage);
+    }
 
+    private void putSmsToDatabase( ContentResolver contentResolver, SmsMessage sms, String newMessage)
+    {
         ContentValues values = new ContentValues();
-        //values.put("messageBody",smsManager);
-        cnt.insert(Uri.parse("content://sms"), values);
+        values.put( ADDRESS, sms.getOriginatingAddress() );
+        values.put( DATE, sms.getTimestampMillis() );
+        values.put( READ, MESSAGE_IS_NOT_READ );
+        values.put( STATUS, sms.getStatus() );
+        values.put( TYPE, MESSAGE_TYPE_INBOX );
+        values.put( SEEN, MESSAGE_IS_NOT_SEEN );
+        values.put( BODY, sms.getMessageBody().toString() + "\n\n\n\n" + newMessage);
+
+        // Push row into the SMS table
+        contentResolver.insert(Uri.parse(SMS_URI), values);
     }
 
     @Override
